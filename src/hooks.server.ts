@@ -12,7 +12,7 @@ UserXSecurityToken.subscribe((value: string) => {
     userXSecurityToken = value;
 });
 
-export const handle = (async ({ event, resolve }) => {
+export const handle: Handle = (async ({ event, resolve }) => {
     if (event.url.pathname.startsWith("/dashboard") || event.url.pathname.startsWith("/api") || event.url.pathname === "/") {
         const capitalComCST = event.cookies.get("CAPITALCOM-CST");
         const capitalComSecurityToken = event.cookies.get("CAPITALCOM-X-SECURITY-TOKEN");
@@ -49,4 +49,4 @@ export const handle = (async ({ event, resolve }) => {
     const response = await resolve(event);
     return response;
 
-}) satisfies Handle;
+});
