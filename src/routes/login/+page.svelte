@@ -32,7 +32,7 @@
     async function handleSelectedAcountSubmit() {
         showDialogLoadingButton = true;
         if(selectedAccount === undefined || dialogOpen === false) { return; }
-        console.log(selectedAccount);
+
         const apiResponse = await (await fetch("/api/selectcapitalcomaccount", {
             method: "POST",
             headers: {
@@ -44,8 +44,6 @@
                 selectedAccount: selectedAccount
             })
         })).json();
-
-        console.log(apiResponse);
 
         showDialogLoadingButton = false
         if(apiResponse.success === true) {
@@ -159,7 +157,8 @@
     </Card.Root>
 </div>
 
-<div class="flex justify-center items-center h-screen max-w-[3/4] w-[400px]">
+
+<div class="content-center shadow-2xl w-1/2 md:max-w-[400px] max-w-[3/4]">
     <Dialog.Root open={dialogOpen} closeOnOutsideClick={false} closeOnEscape={false} onOpenChange={(open) => { if(open === false) { selectedAccount = undefined; dialogOpen = false } else if(open === true) { dialogOpen = true } } }> 
         <Dialog.Content>
             <Dialog.Header>

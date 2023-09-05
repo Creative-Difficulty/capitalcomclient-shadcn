@@ -29,8 +29,8 @@ export const POST: RequestHandler = (async ({ cookies, request }) => {
     });
             
     let parsedUserAccountsResponse: CapitalComUserAccounts = await userAccountsResponse.json();
-    if(parsedUserAccountsResponse.errorCode !== undefined) { console.log(`Error while getting all acounts for user: ${parsedUserAccountsResponse.errorCode}`); return json({ error: `Error while getting all acounts for user: ${parsedUserAccountsResponse.errorCode}` }, { status: 500 }); }
-    if(parsedUserAccountsResponse.accounts?.length === 0) { console.log(`User has no accounts!: ${parsedUserAccountsResponse}`); return json({ error: "The selected account does not have any trading accounts." }, { status: 500 }); }
+    if(parsedUserAccountsResponse.errorCode !== undefined) { console.error(`Error while getting all acounts for user: ${parsedUserAccountsResponse.errorCode}`); return json({ error: `Error while getting all acounts for user: ${parsedUserAccountsResponse.errorCode}` }, { status: 500 }); }
+    if(parsedUserAccountsResponse.accounts?.length === 0) { console.error(`User has no accounts!: ${parsedUserAccountsResponse}`); return json({ error: "The selected account does not have any trading accounts." }, { status: 500 }); }
     
     let submittedAccountName = JSON.parse((await request.text())).selectedAccount;
     if(parsedUserAccountsResponse.accounts!.find(account => account.accountName === submittedAccountName) !== undefined) {
@@ -48,7 +48,7 @@ export const POST: RequestHandler = (async ({ cookies, request }) => {
         })).json();
 
         if(parsedSwitchAccountResponse.errorCode !== undefined && parsedSwitchAccountResponse.errorCode !== "error.not-different.accountId") {
-            console.log(`Error while selecting account: ${parsedSwitchAccountResponse.errorCode!}`); return json({ error: `Error while switching account: ${parsedSwitchAccountResponse.errorCode!}` }, { status: 500 });
+            console.error(`Error while selecting account: ${parsedSwitchAccountResponse.errorCode!}`); return json({ error: `Error while switching account: ${parsedSwitchAccountResponse.errorCode!}` }, { status: 500 });
         } else if(parsedSwitchAccountResponse.errorCode === "error.not-different.accountId") {
             return json({ success: true, msg: `Already signed in to ${submittedAccountName}.` }, { status: 200 });
         }

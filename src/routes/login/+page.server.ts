@@ -2,8 +2,6 @@ import type { CapitalComCreateSessionResponse, CapitalComUserAccounts } from "$l
 import type { Actions } from "./$types";
 import { UserCST, UserXSecurityToken } from "$lib/stores"
 
-// export const ssr = false;
-
 let userCST: string;
 UserCST.subscribe((value: string) => {
     userCST = value;
@@ -79,7 +77,7 @@ export const actions = {
             });
             
             let parsedUserAccountsResponse: CapitalComUserAccounts = await userAccountsResponse.json();
-            if(parsedUserAccountsResponse.errorCode !== undefined) { console.log(`Error while getting all acounts for user: ${parsedUserAccountsResponse.errorCode}`); }
+            if(parsedUserAccountsResponse.errorCode !== undefined) { console.error(`Error while getting all acounts for user: ${parsedUserAccountsResponse.errorCode}`); }
             
             return {
                 "showSelectAccountDialog": true,
