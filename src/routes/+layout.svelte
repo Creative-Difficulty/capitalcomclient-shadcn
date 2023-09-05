@@ -4,6 +4,7 @@
     import { UserCST, UserXSecurityToken } from "$lib/stores";
     import "../app.postcss";
     import { redirect } from "@sveltejs/kit";
+    import { Toaster } from "svelte-french-toast";
 
     if($page.route.id?.startsWith("/dashboard")) {
         setInterval(async () => {
@@ -22,8 +23,9 @@
             if(parsedResponse.errorCode !== undefined) {
                 throw redirect(302, "/login");
             }
-            console.debug("Layout auth check ran!");
         }, 580000)
     }
 </script>
+
+<Toaster/>
 <slot />

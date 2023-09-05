@@ -112,4 +112,11 @@ export interface Balance {
     profitLoss: number
     available: number
 }
-  
+
+export interface SwitchAccountsResponse {
+    trailingStopsEnabled?: boolean
+    dealingEnabled?: boolean
+    hasActiveDemoAccounts?: boolean
+    hasActiveLiveAccounts?: boolean
+    errorCode?: string
+}

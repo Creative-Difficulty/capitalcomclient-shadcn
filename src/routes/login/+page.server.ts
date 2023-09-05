@@ -1,7 +1,6 @@
 import type { CapitalComCreateSessionResponse, CapitalComUserAccounts } from "$lib/types";
 import type { Actions } from "./$types";
 import { UserCST, UserXSecurityToken } from "$lib/stores"
-import { redirect } from '@sveltejs/kit';
 
 let userCST: string;
 UserCST.subscribe((value: string) => {
@@ -78,7 +77,7 @@ export const actions = {
             });
             
             let parsedUserAccountsResponse: CapitalComUserAccounts = await userAccountsResponse.json();
-            if(parsedUserAccountsResponse.errorCode !== undefined) { console.log(`Error while getting all acounts for user: ${parsedUserAccountsResponse.errorCode}`); }
+            if(parsedUserAccountsResponse.errorCode !== undefined) { console.error(`Error while getting all acounts for user: ${parsedUserAccountsResponse.errorCode}`); }
             
             return {
                 "showSelectAccountDialog": true,

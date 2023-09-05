@@ -1,12 +1,14 @@
 <script lang="ts">
-	import type { RadioGroupItemProps } from "radix-svelte";
+	import { RadioGroup as RadioGroupPrimitive } from "bits-ui";
 	import { Circle } from "lucide-svelte";
-	import { RadioGroup as RadioGroupPrimitive } from "radix-svelte";
 	import { cn } from "$lib/utils";
 
-	let className: string | undefined | null = undefined;
+	type $$Props = RadioGroupPrimitive.ItemProps;
+	type $$Events = RadioGroupPrimitive.ItemEvents;
+
+	let className: $$Props["class"] = undefined;
+	export let value: $$Props["value"];
 	export { className as class };
-	export let value: RadioGroupItemProps["value"] = "";
 </script>
 
 <RadioGroupPrimitive.Item
@@ -16,8 +18,11 @@
 		className
 	)}
 	{...$$restProps}
+	on:m-click
 >
-	<RadioGroupPrimitive.Indicator class="flex items-center justify-center">
-		<Circle class="h-2.5 w-2.5 fill-current text-current" />
-	</RadioGroupPrimitive.Indicator>
+	<div class="flex items-center justify-center">
+		<RadioGroupPrimitive.ItemIndicator>
+			<Circle class="h-2.5 w-2.5 fill-current text-current" />
+		</RadioGroupPrimitive.ItemIndicator>
+	</div>
 </RadioGroupPrimitive.Item>

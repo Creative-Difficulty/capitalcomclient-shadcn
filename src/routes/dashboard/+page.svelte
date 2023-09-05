@@ -1,23 +1,13 @@
 	
 <script lang="ts">
-    import { Button } from "$components/ui/button";
-    import {
-        Card,
-        CardContent,
-        CardDescription,
-        CardFooter,
-        CardHeader,
-        CardTitle
-    } from "$components/ui/card";
-    import { Switch } from "$components/ui/switch";
+    import { Button } from "$lib/components/ui/button";
+    import * as Card from "$lib/components/ui/card";
     import { Check } from 'lucide-svelte';
     import { UserCST, UserXSecurityToken } from "$lib/stores";
-    import { browser } from "$app/environment";
     let errorWhenGettingTrades = false
     // let trades: { title?: string; description?: string; error?: string }[] = [];
     let trades: Array<{ title?: string; description?: string; error?: string }> = [];
 
-    
     async () => {
         trades = await (await fetch("/api/getrecenttrades", {
             method: "GET",
@@ -39,7 +29,10 @@
             }
         })).json();
         
-        if(trades[0].error !== undefined) { 
+        // if(trades[0]?) {
+
+        // }
+        if((trades[0]?.error ?? undefined) !== undefined) { 
             errorWhenGettingTrades = true;
             clearInterval(getTradesInterval);
         }
@@ -49,13 +42,13 @@
 
 
 <div class="p-5 flex flex-wrap flex-initial gap-4">
-    <Card class="shadow-2xl rounded-lg">
-        <CardHeader>
-            <CardTitle>Trades</CardTitle>
+    <Card.Root class="shadow-2xl rounded-lg">
+        <Card.Header>
+            <Card.Title>Trades</Card.Title>
             <!--  -->
-            <CardDescription>within the last 10 minutes</CardDescription>
-        </CardHeader>
-        <CardContent class="grid gap-4">
+            <Card.Description>within the last 10 minutes</Card.Description>
+        </Card.Header>
+        <Card.Content class="grid gap-4">
             <!-- <div class=" flex items-center space-x-4 rounded-md border p-4">
                 <div class="flex-1 space-y-1">
                     <p class="text-sm font-medium leading-none">Push Notifications</p>
@@ -84,11 +77,8 @@
                 </div>
             {/if}
             
-        </CardContent>
-        <CardFooter>
-            <Button class="w-full">
-                Mark all as read
-            </Button>
-        </CardFooter>
-    </Card>
+        </Card.Content>
+        <Card.Footer>
+        </Card.Footer>
+    </Card.Root>
 </div>

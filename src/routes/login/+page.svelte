@@ -1,51 +1,74 @@
-	
 <script lang="ts">
-    import {
-        Card,
-        CardContent,
-        CardDescription,
-        CardFooter,
-        CardHeader,
-        CardTitle
-    } from "$components/ui/card";
-    import {
-        Dialog,
-        DialogContent,
-        DialogDescription,
-        DialogFooter,
-        DialogHeader,
-        DialogTitle
-    } from "$components/ui/dialog";
-    import { Button } from "$components/ui/button";
-    import { Input } from "$components/ui/input";
-    import { Label } from "$components/ui/label";
-    import { Checkbox } from "$components/ui/checkbox";
-    import { RadioGroup, RadioGroupItem } from "$components/ui/radio-group";
-    import { Badge } from "$components/ui/badge";
+    import * as Card from "$lib/components/ui/card";
+    import * as Dialog from "$lib/components/ui/dialog";
+    import { Button } from "$lib/components/ui/button";
+    import { Input } from "$lib/components/ui/input";
+    import { Label } from "$lib/components/ui/label";
+    import { Checkbox } from "$lib/components/ui/checkbox";
+    import * as RadioGroup from "$lib/components/ui/radio-group";
+    import { Badge } from "$lib/components/ui/badge";
 
     import { LogIn } from 'lucide-svelte';
     import { Loader2 } from "lucide-svelte";
     import { enhance } from "$app/forms";
     import type { ActionData } from "./$types";
+    import { UserCST, UserXSecurityToken } from "$lib/stores";
+    import toast from "svelte-french-toast";
+    import { goto } from "$app/navigation";
+    
+    export let form: ActionData;
 
     let disclaimerAcknowledged = false;
+    let showLoadingButton = false;
+    let showDialogLoadingButton = false;
 
     let progressiveWrongEmail = false;
     let progressiveWrongPassword = false;
     let progressiveWrongAPIKey = false;
-    let showLoadingButton = false;
 
-    let selectedAccount: string;
-    $: console.log(selectedAccount);
-    export let form: ActionData;
+    let selectedAccount: string | undefined = undefined;
+    $: dialogOpen = form?.showSelectAccountDialog ?? false;
+
+    async function handleSelectedAcountSubmit() {
+        showDialogLoadingButton = true;
+        if(selectedAccount === undefined || dialogOpen === false) { return; }
+
+        const apiResponse = await (await fetch("/api/selectcapitalcomaccount", {
+            method: "POST",
+            headers: {
+                "CAPITALCOM-CST": $UserCST,
+                "CAPITALCOM-X-SECURITY-TOKEN": $UserXSecurityToken, 
+                "Content-Type" : "application/json"
+            },
+            body: JSON.stringify({
+                selectedAccount: selectedAccount
+            })
+        })).json();
+
+        showDialogLoadingButton = false
+        if(apiResponse.success === true) {
+            toast.success("Successfully signed in!");
+            dialogOpen = false;
+            goto("/dashboard");
+        } else if(apiResponse.error) {
+            toast.error(apiResponse.error);
+        } else if(apiResponse.msg !== undefined && apiResponse.success === true) {
+            toast.success(apiResponse.msg);
+            dialogOpen = false;
+            goto("/dashboard");
+        } else {
+            toast.error(`An Error ocurred: ${apiResponse}`);
+        }
+    }
+    
 </script>
 
 <div class="flex justify-center items-center h-screen">
-    <Card class="shadow-2xl rounded-lg w-3/4 max-w-[3/4] md:w-[400px] md:pb-5">
-        <CardHeader>
-            <CardTitle>Login</CardTitle>
-            <CardDescription>Sign in to your capital.com account.</CardDescription>
-        </CardHeader>
+    <Card.Root class="shadow-2xl rounded-lg w-3/4 max-w-[3/4] md:w-[400px] md:pb-5">
+        <Card.Header>
+            <Card.Title>Login</Card.Title>
+            <Card.Description>Sign in to your capital.com account.</Card.Description>
+        </Card.Header>
         <form method="POST" on:submit={() => showLoadingButton = true}
             use:enhance={({ formElement, formData, action, cancel, submitter }) => {
                 showLoadingButton = true;
@@ -80,7 +103,7 @@
                 
             }}
         >
-            <CardContent class="space-y-2">
+            <Card.Content class="space-y-2">
                 <div class="space-y-1">
                     <Label for="user_email">E-Mail</Label>
                     <Input type="text" name="user_email" class="{progressiveWrongEmail || form?.error === "invalid_details" || form?.error === "invalid_unknown" ? "border-2 border-rose-600" : ""}"/>
@@ -109,56 +132,8 @@
                     <p class="text-sm text-muted-foreground">I (the user) acknowledge that the deveopler of this software is not in any way affiliated with capital.com.</p>
                     </div>
                 </div>
-                
-                <Dialog open={form?.showSelectAccountDialog ?? false} modal={true}>
-                    <DialogContent class="max-w-[3/4] w-[400px]">
-                        <DialogHeader>
-                        <DialogTitle>Edit profile</DialogTitle>
-                        <DialogDescription>
-                            Select the trading account, which you want to use for trading.
-                        </DialogDescription>
-                        </DialogHeader>
-                        {#if form?.accounts}
-                            <!-- <div class="grid gap-4">
-                                <RadioGroup value={form?.accounts[0].accountName.toLowerCase()} on:change:data-state={(event) => console.log(event)}>
-                                    {#each (form?.accounts ?? []) as account, index}
-                                        <div class="flex items-center space-x-2">
-                                            <RadioGroupItem value={account.accountName.toLowerCase()} id="r-{index}" name={index}/>
-                                            <Label for="r-{index}">{account.accountName}</Label>
-                                            <Badge variant="secondary">{account.balance.balance} {account.currency}</Badge>
-                                            {#if account.preferred}
-                                                <Badge variant="secondary" class="border-green-400 bg-green-300">preferred</Badge>
-                                            {/if}
-                                        </div>
-                                    {/each}
-                                </RadioGroup>
-                            </div> -->
-                            
-                            <div class="grid gap-4">
-                                <form class="grid gap-2">
-                                    {#each (form?.accounts ?? []) as account, index}
-                                        <div class="flex items-center space-x-2">
-                                            <label class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                                                <input type="radio" bind:group={selectedAccount} value={account.accountName.toLowerCase()} name={index.toString()} />
-                                                {account.accountName}
-                                            </label>
-                                            <Badge variant="secondary">{account.balance.balance} {account.currency}</Badge>
-                                            {#if account.preferred}
-                                                <Badge variant="secondary" class="border-green-400 bg-green-300">preferred</Badge>
-                                            {/if}
-                                        </div>
-                                    {/each}
-
-                                </form>
-                            </div>
-                        {/if}
-                        <DialogFooter>
-                            <Button type="submit">Select account</Button>
-                        </DialogFooter>
-                    </DialogContent>
-                </Dialog>
-            </CardContent>
-            <CardFooter>
+            </Card.Content>
+            <Card.Footer>
                 {#if disclaimerAcknowledged}
                     {#if showLoadingButton}
                         <Button disabled>
@@ -177,7 +152,52 @@
                         Log in
                     </Button>
                 {/if}
-            </CardFooter>
+            </Card.Footer>
         </form>
-    </Card>
+    </Card.Root>
+</div>
+
+
+<div class="content-center shadow-2xl w-1/2 md:max-w-[400px] max-w-[3/4]">
+    <Dialog.Root open={dialogOpen} closeOnOutsideClick={false} closeOnEscape={false} onOpenChange={(open) => { if(open === false) { selectedAccount = undefined; dialogOpen = false } else if(open === true) { dialogOpen = true } } }> 
+        <Dialog.Content>
+            <Dialog.Header>
+                <Dialog.Title>Select capital.com account</Dialog.Title>
+                <Dialog.Description>
+                    Select the trading account, which you want to use for trading.
+                </Dialog.Description>
+            </Dialog.Header>
+            {#if form?.accounts}
+                <div class="grid gap-4">
+                    <RadioGroup.Root onValueChange={selectedValue => selectedAccount = selectedValue}>
+                        {#each (form?.accounts ?? []) as account, index}
+                            <div class="flex items-center space-x-2">
+                                <RadioGroup.Item value={account.accountName} id="r-{index}"/>
+                                <Label for="r-{index}">{account.accountName}</Label>
+                                <Badge variant="secondary">{account.balance.balance} {account.currency}</Badge>
+                                {#if account.preferred}
+                                    <Badge variant="secondary" class="border-green-400 bg-green-300">preferred</Badge>
+                                {/if}
+                            </div>
+                        {/each}
+                    </RadioGroup.Root>
+                </div>
+            {/if}
+            <Dialog.Footer>
+                
+            {#if selectedAccount !== undefined}
+                {#if showDialogLoadingButton}
+                    <Button disabled>
+                        <Loader2 class="mr-2 h-4 w-4 animate-spin" />
+                        Loading...
+                    </Button>
+                {:else}
+                    <Button on:click={async () => await handleSelectedAcountSubmit()}>Select account</Button>
+                {/if}
+            {:else}
+                <Button disabled>Select account</Button>
+            {/if}
+            </Dialog.Footer>
+        </Dialog.Content>
+    </Dialog.Root>
 </div>

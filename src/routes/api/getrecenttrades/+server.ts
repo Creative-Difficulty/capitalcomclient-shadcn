@@ -42,17 +42,15 @@ export const GET = (async ({ cookies }) => {
             });
             
             const parsedTradeDetailsResponse: CapitalComTradeDetailsResponse = await tradeDetailsResponse.json();
-            console.log(parsedTradeDetailsResponse);
             if(parsedTradeDetailsResponse.errorCode === undefined) {
                 tradeArrayToReturn.push({
                     title: `${parsedTradeDetailsResponse.position!.direction! === "BUY" ? "Bought" : "Sold"} ${parsedTradeDetailsResponse.position!.size!} ${parsedTradeDetailsResponse!.market?.instrumentType.toLowerCase()} of ${parsedTradeDetailsResponse.market!.instrumentName}`,
                     description: `${new Date(new Date().getTime() - new Date(parsedTradeDetailsResponse.position!.createdDate).getTime()).getMinutes()} ${(new Date(new Date().getTime() - new Date(parsedTradeDetailsResponse.position!.createdDate).getTime()).getMinutes()) === 1 ? "minute" : "minutes"} ago`
                 })
             } else {
-                console.log(`Error when getting details of one trade: ${parsedTradeDetailsResponse.errorCode}`);
+                console.error(`Error when getting details of one trade: ${parsedTradeDetailsResponse.errorCode}`);
             }
         }
     }));
-    console.log(tradeArrayToReturn);
     return json(tradeArrayToReturn, { status: 200 });
 }) satisfies RequestHandler
