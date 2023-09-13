@@ -1,6 +1,6 @@
 <script lang="ts">
     import { page } from "$app/stores";
-    import type { CapitalComPingResponse } from "$lib/types"
+    import type { CapitalComPingResponse } from "$lib/types";
     import { UserCST, UserXSecurityToken } from "$lib/stores";
     import "../app.postcss";
     import { redirect } from "@sveltejs/kit";

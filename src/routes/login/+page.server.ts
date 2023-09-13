@@ -2,6 +2,8 @@ import type { CapitalComCreateSessionResponse, CapitalComUserAccounts } from "$l
 import type { Actions } from "./$types";
 import { UserCST, UserXSecurityToken } from "$lib/stores"
 
+// export const ssr = false;
+
 let userCST: string;
 UserCST.subscribe((value: string) => {
     userCST = value;
