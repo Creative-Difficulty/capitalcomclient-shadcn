@@ -1,6 +1,6 @@
 <script lang="ts">
     import * as Card from "$lib/components/ui/card";
-    import * as Dialog from "$lib/components/ui/dialog";
+    import * as AlertDialog from "$lib/components/ui/alert-dialog";
     import { Button } from "$lib/components/ui/button";
     import { Input } from "$lib/components/ui/input";
     import { Label } from "$lib/components/ui/label";
@@ -33,7 +33,7 @@
         showDialogLoadingButton = true;
         if(selectedAccount === undefined || dialogOpen === false) { return; }
 
-        const apiResponse = await (await fetch("/api/selectcapitalcomaccount", {
+        const apiResponse = await (await fetch("/api/selectaccount", {
             method: "POST",
             headers: {
                 "CAPITALCOM-CST": $UserCST,
@@ -159,14 +159,14 @@
 
 
 <div class="content-center shadow-2xl w-1/2 md:max-w-[400px] max-w-[3/4]">
-    <Dialog.Root open={dialogOpen} closeOnOutsideClick={false} closeOnEscape={false} onOpenChange={(open) => { if(open === false) { selectedAccount = undefined; dialogOpen = false } else if(open === true) { dialogOpen = true } } }> 
-        <Dialog.Content>
-            <Dialog.Header>
-                <Dialog.Title>Select capital.com account</Dialog.Title>
-                <Dialog.Description>
+    <AlertDialog.Root open={dialogOpen} closeOnOutsideClick={false} closeOnEscape={false} onOpenChange={(open) => { if(open === false) { selectedAccount = undefined; dialogOpen = false } else if(open === true) { dialogOpen = true } } }> 
+        <AlertDialog.Content>
+            <AlertDialog.Header>
+                <AlertDialog.Title>Select capital.com account</AlertDialog.Title>
+                <AlertDialog.Description>
                     Select the trading account, which you want to use for trading.
-                </Dialog.Description>
-            </Dialog.Header>
+                </AlertDialog.Description>
+            </AlertDialog.Header>
             {#if form?.accounts}
                 <div class="grid gap-4">
                     <RadioGroup.Root onValueChange={selectedValue => selectedAccount = selectedValue}>
@@ -183,7 +183,7 @@
                     </RadioGroup.Root>
                 </div>
             {/if}
-            <Dialog.Footer>
+            <AlertDialog.Footer>
                 
             {#if selectedAccount !== undefined}
                 {#if showDialogLoadingButton}
@@ -192,12 +192,12 @@
                         Loading...
                     </Button>
                 {:else}
-                    <Button on:click={async () => await handleSelectedAcountSubmit()}>Select account</Button>
+                    <AlertDialog.Action on:click={async () => await handleSelectedAcountSubmit()}>Select account</AlertDialog.Action>
                 {/if}
             {:else}
                 <Button disabled>Select account</Button>
             {/if}
-            </Dialog.Footer>
-        </Dialog.Content>
-    </Dialog.Root>
+            </AlertDialog.Footer>
+        </AlertDialog.Content>
+    </AlertDialog.Root>
 </div>

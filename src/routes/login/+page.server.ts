@@ -2,6 +2,8 @@ import type { CapitalComCreateSessionResponse, CapitalComUserAccounts } from "$l
 import type { Actions } from "./$types";
 import { UserCST, UserXSecurityToken } from "$lib/stores"
 
+// export const ssr = false;
+
 let userCST: string;
 UserCST.subscribe((value: string) => {
     userCST = value;
@@ -22,12 +24,12 @@ export const actions = {
         const response: Response = await fetch("https://api-capital.backend-capital.com/api/v1/session", {
             method: "POST",
             headers: {
-                "X-CAP-API-KEY": userAPIKey, //SO6ZbQW5AIXmqE7A
+                "X-CAP-API-KEY": userAPIKey,
                 "Content-Type" : "application/json"
             },
             body: JSON.stringify({
-                "identifier": userEmail, //dh2jttwtj5@privaterelay.appleid.com
-                "password": userPassword //Neu9Sept!
+                "identifier": userEmail,
+                "password": userPassword
             })
         });
 

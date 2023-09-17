@@ -44,20 +44,15 @@
 <div class="p-5 flex flex-wrap flex-initial gap-4">
     <Card.Root class="shadow-2xl rounded-lg">
         <Card.Header>
-            <Card.Title>Trades</Card.Title>
+            <Card.Title>Trade History</Card.Title>
             <!--  -->
-            <Card.Description>within the last 10 minutes</Card.Description>
+            <Card.Description>Your most recent trades will be shown here.</Card.Description>
         </Card.Header>
         <Card.Content class="grid gap-4">
-            <!-- <div class=" flex items-center space-x-4 rounded-md border p-4">
-                <div class="flex-1 space-y-1">
-                    <p class="text-sm font-medium leading-none">Push Notifications</p>
-                    <p class="text-sm text-muted-foreground">Send notifications to device.</p>
-                </div>
-                <Switch />
-            </div> -->
             {#if errorWhenGettingTrades}
-                <p>Error when getting recent trades: "{trades[0].error}"</p>
+                <div class="items-center justify-center">
+                    <p>Error when getting recent trades: "{trades[0].error}"</p>
+                </div>
             {:else}
                 <div>
                     {#each trades as trade, index (index)}
