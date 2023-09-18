@@ -27,11 +27,19 @@
     let progressiveWrongAPIKey = false;
 
     let selectedAccount: string | undefined = undefined;
+    let selectedAccountValid: boolean | undefined = undefined;
+    let selectedAccountIsDemo: boolean | undefined = undefined;
     $: dialogOpen = form?.showSelectAccountDialog ?? false;
 
     async function handleSelectedAcountSubmit() {
         showDialogLoadingButton = true;
         if(selectedAccount === undefined || dialogOpen === false) { return; }
+        form?.accounts!.forEach(account => {
+            if(account.accountName === selectedAccount){ selectedAccountValid === true }
+            if(account.accountName === selectedAccount && account.demo === true){ selectedAccountValid === true; selectedAccountIsDemo = true }
+        });
+
+        if(selectedAccountValid === false) { return; }
 
         const apiResponse = await (await fetch("/api/selectaccount", {
             method: "POST",
@@ -41,7 +49,8 @@
                 "Content-Type" : "application/json"
             },
             body: JSON.stringify({
-                selectedAccount: selectedAccount
+                selectedAccount: selectedAccount,
+                isDemo: selectedAccountIsDemo
             })
         })).json();
 
@@ -174,9 +183,14 @@
                             <div class="flex items-center space-x-2">
                                 <RadioGroup.Item value={account.accountName} id="r-{index}"/>
                                 <Label for="r-{index}">{account.accountName}</Label>
-                                <Badge variant="secondary">{account.balance.balance} {account.currency}</Badge>
                                 {#if account.preferred}
                                     <Badge variant="secondary" class="border-green-400 bg-green-300">preferred</Badge>
+                                {/if}
+                                {#if account.demo === true}
+                                    <Badge variant="secondary">{account.balance.balance} {account.currency.substring(0, account.currency.lastIndexOf("d")) + account.currency.substring(account.currency.lastIndexOf("d") + 1)}</Badge>
+                                    <Badge variant="secondary" class="border-yellow-400 bg-yellow-300">demo</Badge>
+                                {:else}
+                                    <Badge variant="secondary">{account.balance.balance} {account.currency}</Badge>
                                 {/if}
                             </div>
                         {/each}

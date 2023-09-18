@@ -1,6 +1,6 @@
 import { redirect, type Handle } from '@sveltejs/kit';
-import type { CapitalComUserAccounts } from "$lib/types"
-import { UserCST, UserXSecurityToken } from "$lib/stores";
+import type { BaseAPIURLType, CapitalComUserAccounts } from "$lib/types"
+import { UserCST, UserXSecurityToken, BaseAPIURL } from "$lib/stores";
 
 let userCST: string;
 UserCST.subscribe((value: string) => {
@@ -12,15 +12,21 @@ UserXSecurityToken.subscribe((value: string) => {
     userXSecurityToken = value;
 });
 
+let baseAPIURL: BaseAPIURLType = "";
+BaseAPIURL.subscribe((value: BaseAPIURLType) => {
+    baseAPIURL = value;
+});
+
 export const handle: Handle = (async ({ event, resolve }) => {
-    if (event.url.pathname.startsWith("/dashboard") || event.url.pathname.startsWith("/api") || event.url.pathname === "/") {
+    if(event.url.pathname.startsWith("/dashboard") || event.url.pathname.startsWith("/api") && !event.url.pathname.startsWith("/api/selectaccount") || event.url.pathname === "/") {
         const capitalComCST = event.cookies.get("CAPITALCOM-CST");
         const capitalComSecurityToken = event.cookies.get("CAPITALCOM-X-SECURITY-TOKEN");
         
-        if(capitalComCST === undefined || capitalComSecurityToken === undefined) {
+        if(capitalComCST === undefined || capitalComSecurityToken === undefined || baseAPIURL === "") {
             throw redirect(302, "/login");
         }
-        const response: Response  = await fetch("https://api-capital.backend-capital.com/api/v1/accounts", {
+        
+        const response: Response = await fetch(`${baseAPIURL}/api/v1/accounts`, {
             method: "GET",
             headers: {
                 "X-SECURITY-TOKEN": capitalComSecurityToken!,

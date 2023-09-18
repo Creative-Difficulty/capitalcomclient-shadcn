@@ -1,6 +1,6 @@
 import { json, redirect, type RequestHandler } from '@sveltejs/kit';
-import type { CapitalComTradeDetailsResponse, CapitalComTradeHistoryResponse } from "$lib/types";
-import { UserCST, UserXSecurityToken } from "$lib/stores";
+import type { BaseAPIURLType, CapitalComTradeDetailsResponse, CapitalComTradeHistoryResponse } from "$lib/types";
+import { BaseAPIURL, UserCST, UserXSecurityToken } from "$lib/stores";
 
 let userCST: string;
 UserCST.subscribe((value: string) => {
@@ -12,12 +12,17 @@ UserXSecurityToken.subscribe((value: string) => {
     userXSecurityToken = value;
 });
 
+let baseAPIURL: BaseAPIURLType = "";
+BaseAPIURL.subscribe((value: BaseAPIURLType) => {
+    baseAPIURL = value;
+});
+
 
 export const GET = (async ({ cookies }) => {
     const capitalComCST = cookies.get("CAPITALCOM-CST");
     const capitalComSecurityToken = cookies.get("CAPITALCOM-X-SECURITY-TOKEN");
 	if(userCST !== capitalComCST || userXSecurityToken !== capitalComSecurityToken) { throw redirect(302, "/login") }
-    const response: Response = await fetch("https://api-capital.backend-capital.com/api/v1/history/activity?type=POSITION&lastPeriod=86400", {
+    const response: Response = await fetch(`${baseAPIURL}/api/v1/history/activity?type=POSITION&lastPeriod=86400`, {
         method: "GET",
         headers: {
             "X-SECURITY-TOKEN": userXSecurityToken,
@@ -32,7 +37,7 @@ export const GET = (async ({ cookies }) => {
 
     await Promise.all(parsedResponse.activities!.map(async trade => {
         if(trade.source === "USER" && trade.type === "POSITION") {
-            const tradeDetailsResponse: Response  = await fetch(`https://api-capital.backend-capital.com/api/v1/positions/${trade.dealId}`, {
+            const tradeDetailsResponse: Response  = await fetch(`${baseAPIURL}/api/v1/positions/${trade.dealId}`, {
                 method: "GET",
                 headers: {
                     "X-SECURITY-TOKEN": userXSecurityToken,

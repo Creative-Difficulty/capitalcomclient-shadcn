@@ -26,6 +26,7 @@ export interface Account {
     accountName: string;
     preferred: boolean;
     accountType: string;
+    demo?: boolean;
 }
 
 export interface CapitalComTradeHistoryResponse {
@@ -119,4 +120,11 @@ export interface SwitchAccountsResponse {
     hasActiveDemoAccounts?: boolean
     hasActiveLiveAccounts?: boolean
     errorCode?: string
+}
+
+export type BaseAPIURLType = "https://api-capital.backend-capital.com" | "https://demo-api-capital.backend-capital.com" | ""
+
+export interface SelectUserAPIRequestBody {
+    isDemo: boolean;
+    selectedAccount: string;
 }
