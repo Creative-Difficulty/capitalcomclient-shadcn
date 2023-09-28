@@ -18,7 +18,7 @@ BaseAPIURL.subscribe((value: BaseAPIURLType) => {
 });
 
 
-export const GET = (async ({ cookies }) => {
+export const GET: RequestHandler = (async ({ cookies }) => {
     const capitalComCST = cookies.get("CAPITALCOM-CST");
     const capitalComSecurityToken = cookies.get("CAPITALCOM-X-SECURITY-TOKEN");
 	if(userCST !== capitalComCST || userXSecurityToken !== capitalComSecurityToken) { throw redirect(302, "/login") }
@@ -58,4 +58,4 @@ export const GET = (async ({ cookies }) => {
         }
     }));
     return json(tradeArrayToReturn, { status: 200 });
-}) satisfies RequestHandler
+})

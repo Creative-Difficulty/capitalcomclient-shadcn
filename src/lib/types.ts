@@ -128,3 +128,11 @@ export interface SelectUserAPIRequestBody {
     isDemo: boolean;
     selectedAccount: string;
 }
+
+export interface AccountBalanceObject {
+    balance?: number;
+    profitloss?: number;
+    available?: number;
+    currency?: string;
+    error?: string;
+};

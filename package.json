@@ -4,12 +4,13 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite dev",
-    "build": "vite build",
-    "preview": "vite preview",
-    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-    "update": "ncu -u && npm i"
+    "dev": "pnpm exec vite dev",
+    "build": "pnpm exec vite build",
+    "preview": "pnpm exec vite preview",
+    "check": "pnpm exec svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "pnpm exec svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+    "update": "pnpm exec ncu -u && npm i",
+    "preinstall": "npx only-allow pnpm"
   },
   "devDependencies": {
     "@sveltejs/adapter-auto": "^2.1.0",

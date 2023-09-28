@@ -1,6 +1,6 @@
 import { json, redirect, type RequestHandler } from '@sveltejs/kit';
-import type { BaseAPIURLType, CapitalComTradeDetailsResponse, CapitalComTradeHistoryResponse } from "$lib/types";
-import { BaseAPIURL, UserCST, UserXSecurityToken } from "$lib/stores";
+import type { BaseAPIURLType, CapitalComUserAccounts } from "$lib/types";
+import { BaseAPIURL, UserCST, UserXSecurityToken, SignedIntoAccount } from "$lib/stores";
 
 let userCST: string;
 UserCST.subscribe((value: string) => {
@@ -17,12 +17,18 @@ BaseAPIURL.subscribe((value: BaseAPIURLType) => {
     baseAPIURL = value;
 });
 
+let signedIntoAccount: string;
+SignedIntoAccount.subscribe((value: string) => {
+    signedIntoAccount = value;
+});
 
-export const GET = (async ({ cookies }) => {
+
+export const GET: RequestHandler = (async ({ cookies }) => {
     const capitalComCST = cookies.get("CAPITALCOM-CST");
     const capitalComSecurityToken = cookies.get("CAPITALCOM-X-SECURITY-TOKEN");
 	if(userCST !== capitalComCST || userXSecurityToken !== capitalComSecurityToken) { throw redirect(302, "/login") }
-    const response: Response = await fetch(`${baseAPIURL}/api/v1/history/activity?type=POSITION&lastPeriod=86400`, {
+
+    const response: Response = await fetch(`${baseAPIURL}/api/v1/accounts`, {
         method: "GET",
         headers: {
             "X-SECURITY-TOKEN": userXSecurityToken,
@@ -31,31 +37,33 @@ export const GET = (async ({ cookies }) => {
         }
     });
 
-    const parsedResponse: CapitalComTradeHistoryResponse = await response.json();
-    if(parsedResponse.errorCode !== undefined) { return json([{ error: parsedResponse.errorCode }]); }
-    let tradeArrayToReturn: Array<{ title?: string; description?: string; error?: string }> = [];
+    const parsedResponse: CapitalComUserAccounts = await response.json();
+    if(parsedResponse.errorCode !== undefined) { return json({ error: parsedResponse.errorCode }); }
+    let accountBalance: number | undefined = undefined;
+    let accountProfitLoss: number | undefined = undefined;
+    let accountAvailable: number | undefined = undefined;
+    let accountCurrency: string | undefined = undefined;
 
-    await Promise.all(parsedResponse.activities!.map(async trade => {
-        if(trade.source === "USER" && trade.type === "POSITION") {
-            const tradeDetailsResponse: Response  = await fetch(`${baseAPIURL}/api/v1/positions/${trade.dealId}`, {
-                method: "GET",
-                headers: {
-                    "X-SECURITY-TOKEN": userXSecurityToken,
-                    "CST": userCST,
-                    "Content-Type" : "application/json"
-                }
-            });
-            
-            const parsedTradeDetailsResponse: CapitalComTradeDetailsResponse = await tradeDetailsResponse.json();
-            if(parsedTradeDetailsResponse.errorCode === undefined) {
-                tradeArrayToReturn.push({
-                    title: `${parsedTradeDetailsResponse.position!.direction! === "BUY" ? "Bought" : "Sold"} ${parsedTradeDetailsResponse.position!.size!} ${parsedTradeDetailsResponse!.market?.instrumentType.toLowerCase()} of ${parsedTradeDetailsResponse.market!.instrumentName}`,
-                    description: `${new Date(new Date().getTime() - new Date(parsedTradeDetailsResponse.position!.createdDate).getTime()).getMinutes()} ${(new Date(new Date().getTime() - new Date(parsedTradeDetailsResponse.position!.createdDate).getTime()).getMinutes()) === 1 ? "minute" : "minutes"} ago`
-                })
-            } else {
-                console.error(`Error when getting details of one trade: ${parsedTradeDetailsResponse.errorCode}`);
-            }
-        }
-    }));
-    return json(tradeArrayToReturn, { status: 200 });
-}) satisfies RequestHandler
+    const accountObject = parsedResponse.accounts!.find(account => account.accountName === signedIntoAccount)
+    if(accountObject === undefined) {
+        console.error(`The account, which the user is signed into \"${signedIntoAccount}\" does not exist.`);
+        return json({ error: `Error: The account, which the user is signed into \"${signedIntoAccount}\" does not exist.` });
+    }
+    
+    accountBalance = accountObject.balance.balance;
+    accountProfitLoss = accountObject.balance.profitLoss;
+    accountAvailable = accountObject.balance.available;
+    accountCurrency = accountObject.currency;
+
+    if(accountBalance === undefined || accountProfitLoss === undefined || accountAvailable === undefined || accountCurrency === undefined) {
+        console.error(`One of the properties (balance, P/L, available balance, account currency) of the account \"${signedIntoAccount}\" does not exist.`);
+        return json({ error: `Error: One of the properties (balance, P/L, available balance, account currency) of the account \"${signedIntoAccount}\" does not exist.` });
+    }
+
+    return json({
+        balance: accountBalance,
+        profitloss: accountProfitLoss,
+        available: accountAvailable,
+        currency: accountCurrency
+    }, { status: 200 });
+})

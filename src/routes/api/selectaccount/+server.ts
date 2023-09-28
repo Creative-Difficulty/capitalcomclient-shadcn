@@ -1,6 +1,6 @@
 import { json, redirect, type RequestHandler } from '@sveltejs/kit';
-import type { CapitalComUserAccounts, SelectUserAPIRequestBody, SwitchAccountsResponse } from "$lib/types";
-import { UserCST, UserXSecurityToken, BaseAPIURL } from "$lib/stores";
+import type { Account, CapitalComUserAccounts, SelectUserAPIRequestBody, SwitchAccountsResponse } from "$lib/types";
+import { UserCST, UserXSecurityToken, BaseAPIURL, SignedIntoAccount } from "$lib/stores";
 
 let userCST: string;
 UserCST.subscribe((value: string) => {
@@ -12,6 +12,10 @@ UserXSecurityToken.subscribe((value: string) => {
     userXSecurityToken = value;
 });
 
+let signedIntoAccount: string;
+SignedIntoAccount.subscribe((value: string) => {
+    signedIntoAccount = value;
+});
 
 export const POST: RequestHandler = (async ({ cookies, request }) => {
     const capitalComCST = cookies.get("CAPITALCOM-CST");
@@ -42,7 +46,7 @@ export const POST: RequestHandler = (async ({ cookies, request }) => {
 
     if(parsedUserAccountsResponse.errorCode !== undefined) { console.error(`Error while getting all accounts for user: ${parsedUserAccountsResponse.errorCode}`); return json({ error: `Error while getting all accounts for user: ${parsedUserAccountsResponse.errorCode}` }, { status: 500 }); }
     if(parsedDemoUserAccountsResponse.errorCode !== undefined) { console.error(`Error while getting all accounts for user: ${parsedDemoUserAccountsResponse.errorCode}`); return json({ error: `Error while getting all accounts for user: ${parsedDemoUserAccountsResponse.errorCode}` }, { status: 500 }); }
-    if(parsedDemoUserAccountsResponse.accounts?.length === 0 && parsedUserAccountsResponse.accounts?.length === 0) { console.log(`User has no demo or spot trading accounts: ${parsedDemoUserAccountsResponse}`); return json({ error: "The selected account does not have any trading accounts." }, { status: 500 }); }
+    if(parsedDemoUserAccountsResponse.accounts?.length === 0 && parsedUserAccountsResponse.accounts?.length === 0) { console.error(`User has no demo or live trading accounts: ${parsedDemoUserAccountsResponse}`); return json({ error: "The selected account does not have any trading accounts." }, { status: 500 }); }
     
     let submittedRequestBody: SelectUserAPIRequestBody = JSON.parse((await request.clone().text()))
     let submittedAccountName = submittedRequestBody.selectedAccount;
@@ -62,6 +66,10 @@ export const POST: RequestHandler = (async ({ cookies, request }) => {
                 }),
                 redirect: "follow"
             })).json();
+
+            if(parsedSignInToAccountResponse.hasActiveDemoAccounts === false && parsedSignInToAccountResponse.hasActiveLiveAccounts === false) {
+                { console.error(`User has no demo or live trading accounts: ${parsedDemoUserAccountsResponse}`); return json({ error: "The selected account does not have any trading accounts." }, { status: 500 }); }
+            }
     
             if(parsedSignInToAccountResponse.errorCode !== undefined && parsedSignInToAccountResponse.errorCode !== "error.not-different.accountId") {
                 console.error(`Error while selecting demo account: ${parsedSignInToAccountResponse.errorCode!}`); return json({ error: `Error while switching account: ${parsedSignInToAccountResponse.errorCode!}` }, { status: 500 });
@@ -70,6 +78,7 @@ export const POST: RequestHandler = (async ({ cookies, request }) => {
             }
             
             BaseAPIURL.set("https://demo-api-capital.backend-capital.com");
+            SignedIntoAccount.set(submittedAccountName);
             return json({ success: true }, { status: 200 });
         } else {
             return json({ error: `The selected account \"${submittedAccountName}\" does not exist.` }, { status: 500 });
@@ -88,7 +97,11 @@ export const POST: RequestHandler = (async ({ cookies, request }) => {
                 }),
                 redirect: "follow"
             })).json();
-    
+
+            if(parsedSignInToAccountResponse.hasActiveDemoAccounts === false && parsedSignInToAccountResponse.hasActiveLiveAccounts === false) {
+                { console.error(`User has no demo or live trading accounts: ${parsedDemoUserAccountsResponse}`); return json({ error: "The selected account does not have any trading accounts." }, { status: 500 }); }
+            }
+
             if(parsedSignInToAccountResponse.errorCode !== undefined && parsedSignInToAccountResponse.errorCode !== "error.not-different.accountId") {
                 console.error(`Error while selecting account: ${parsedSignInToAccountResponse.errorCode!}`); return json({ error: `Error while switching account: ${parsedSignInToAccountResponse.errorCode!}` }, { status: 500 });
             } else if(parsedSignInToAccountResponse.errorCode === "error.not-different.accountId") {
@@ -96,6 +109,7 @@ export const POST: RequestHandler = (async ({ cookies, request }) => {
             }
             
             BaseAPIURL.set("https://api-capital.backend-capital.com");
+            SignedIntoAccount.set(submittedAccountName)
             return json({ success: true }, { status: 200 });
         } else {
             return json({ error: `The selected trading account \"${submittedAccountName}\" does not exist.`}, { status: 500 });
