@@ -1,5 +1,5 @@
 import { writable, type Writable } from "svelte/store";
-import type { Account, BaseAPIURLType } from "$lib/types";
+import type { BaseAPIURLType } from "$lib/types";
 
 export const UserCST: Writable<string> = writable("");
 export const UserXSecurityToken: Writable<string> = writable("");
