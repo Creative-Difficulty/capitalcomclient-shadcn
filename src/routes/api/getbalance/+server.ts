@@ -12,7 +12,7 @@ UserXSecurityToken.subscribe((value: string) => {
     userXSecurityToken = value;
 });
 
-let baseAPIURL: BaseAPIURLType = "";
+let baseAPIURL: BaseAPIURLType = undefined;
 BaseAPIURL.subscribe((value: BaseAPIURLType) => {
     baseAPIURL = value;
 });

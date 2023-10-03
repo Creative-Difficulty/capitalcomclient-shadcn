@@ -122,7 +122,7 @@ export interface SwitchAccountsResponse {
     errorCode?: string
 }
 
-export type BaseAPIURLType = "https://api-capital.backend-capital.com" | "https://demo-api-capital.backend-capital.com" | ""
+export type BaseAPIURLType = "https://api-capital.backend-capital.com" | "https://demo-api-capital.backend-capital.com" | undefined
 
 export interface SelectUserAPIRequestBody {
     isDemo: boolean;

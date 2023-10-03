@@ -12,7 +12,7 @@ UserXSecurityToken.subscribe((value: string) => {
     userXSecurityToken = value;
 });
 
-let baseAPIURL: BaseAPIURLType = "";
+let baseAPIURL: BaseAPIURLType = undefined;
 BaseAPIURL.subscribe((value: BaseAPIURLType) => {
     baseAPIURL = value;
 });
@@ -35,7 +35,7 @@ export const GET: RequestHandler = (async ({ cookies }) => {
     if(parsedResponse.errorCode !== undefined) { return json([{ error: parsedResponse.errorCode }]); }
     let tradeArrayToReturn: Array<{ title?: string; description?: string; error?: string }> = [];
 
-    await Promise.all(parsedResponse.activities!.map(async trade => {
+    await Promise.allSettled(parsedResponse.activities!.map(async trade => {
         if(trade.source === "USER" && trade.type === "POSITION") {
             const tradeDetailsResponse: Response  = await fetch(`${baseAPIURL}/api/v1/positions/${trade.dealId}`, {
                 method: "GET",

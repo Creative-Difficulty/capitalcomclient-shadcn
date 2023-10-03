@@ -44,3 +44,5 @@
 // 		currentAccountObject: actualSignedIntoAccountObject
 // 	};
 // };
+
+export const ssr = false;

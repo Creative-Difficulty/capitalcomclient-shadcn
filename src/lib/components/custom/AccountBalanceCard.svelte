@@ -3,6 +3,7 @@
     import * as Card from "$lib/components/ui/card";
     import { UserCST, UserXSecurityToken } from "$lib/stores";
     import type { AccountBalanceObject } from "$lib/types";
+    import { Skeleton } from "$lib/components/ui/skeleton";
 
     export let errorWhenUpdatingBalance = false;
     
@@ -38,12 +39,8 @@
 </script>
 
 <Card.Root  class="shadow-2xl rounded-lg">
-    <Card.Header
-        class="flex flex-row items-center justify-between space-y-0 pb-2"
-    >
-        <Card.Title class="text-sm font-medium"
-            >Balance</Card.Title
-        >
+    <Card.Header class="flex flex-row items-center justify-between space-y-0 pb-2">
+        <Card.Title>Balance</Card.Title>        
         <!-- <EuroSign class="h-4 w-4 text-muted-foreground" /> -->
     </Card.Header>
     <Card.Content>
@@ -53,10 +50,12 @@
             </div>
         {:else}
             <!-- <div class="text-2xl font-bold">{accountBalance} {formattedAccountCurrency}</div> -->
-            <div class="text-2xl font-bold">{accountBalance} </div>
-            <p class="text-xs text-muted-foreground">
-                +20.1% from last month
-            </p>
+            {#if accountBalance === undefined}
+                <Skeleton class="w-[7rem] h-[1.6rem]" />
+            {:else}
+                <p class="text-2xl font-bold">{accountBalance}</p>
+            {/if}
+            <p class="text-xs text-muted-foreground">+20.1% from last month</p>
         {/if}
     </Card.Content>
 </Card.Root>

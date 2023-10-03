@@ -4,12 +4,16 @@
     import { BaseAPIURL, UserCST, UserXSecurityToken } from "$lib/stores";
     import "../app.postcss";
     import { redirect } from "@sveltejs/kit";
-    import { Toaster } from "svelte-french-toast";
+    import toast, { Toaster } from "svelte-french-toast";
     import { onDestroy, onMount } from "svelte";
 
     let refreshTimeout: number;
 
     onMount(() => {
+        if($BaseAPIURL === undefined && !$page.route.id?.startsWith("/login")) {
+            toast.error("Could not refresh authetication state");
+            return;
+        }
         if($page.route.id?.startsWith("/dashboard")) {
             refreshTimeout = setTimeout(async function run() {
                 const response: Response = await fetch(`${$BaseAPIURL}/api/v1/ping`, {
