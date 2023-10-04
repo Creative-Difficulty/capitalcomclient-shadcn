@@ -77,14 +77,13 @@
             <DropdownMenu.Root>
                 <DropdownMenu.Trigger asChild let:builder>
                     <Button builders={[builder]} class=" bg-white focus:bg-white hover:bg-white">
-                        <Avatar.Root >
+                        <Avatar.Root>
                             <Avatar.Fallback>{$SignedIntoAccount.substring(0, 2).toUpperCase()}</Avatar.Fallback>
                         </Avatar.Root>
                     </Button>
                 </DropdownMenu.Trigger>
                 <DropdownMenu.Content class="w-56">
                 <DropdownMenu.Label>My Account</DropdownMenu.Label>
-                <DropdownMenu.Separator />
                 <DropdownMenu.Separator />
                 <DropdownMenu.Item>
                     <Github class="mr-2 h-4 w-4" />

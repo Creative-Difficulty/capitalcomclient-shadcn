@@ -115,21 +115,21 @@
             <Card.Content class="space-y-2">
                 <div class="space-y-1">
                     <Label for="user_email">E-Mail</Label>
-                    <Input type="text" name="user_email" class="{progressiveWrongEmail || form?.error === "invalid_details" || form?.error === "invalid_unknown" ? "border-2 border-rose-600" : ""}"/>
+                    <Input type="text" id="user_email" class="{progressiveWrongEmail || form?.error === "invalid_details" || form?.error === "invalid_unknown" ? "border-2 border-rose-600" : ""}"/>
                     {#if progressiveWrongEmail || form?.error === "invalid_details" || form?.error === "invalid_unknown"}
                         <p class="text-sm text-muted-foreground text-red-600">Please provide a valid E-Mail address.</p>
                     {/if}
                 </div>
                 <div class="space-y-1">
                     <Label for="user_password">Password</Label>
-                    <Input name="user_password" type="password" class="{progressiveWrongPassword || form?.error === "invalid_details" || form?.error === "invalid_unknown" ? "border-2 border-rose-600" : ""}"/>
+                    <Input id="user_password" type="password" class="{progressiveWrongPassword || form?.error === "invalid_details" || form?.error === "invalid_unknown" ? "border-2 border-rose-600" : ""}"/>
                     {#if progressiveWrongPassword || form?.error === "invalid_details" || form?.error === "invalid_unknown"}
                         <p class="text-sm text-muted-foreground text-red-600">Please provide a valid Password.</p>
                     {/if}
                 </div>
                 <div class="space-y-1">
                     <Label for="user_api_key">API Key</Label>
-                    <Input name="user_api_key" type="password" class="{progressiveWrongAPIKey || form?.error === "invalid_api_key" || form?.error === "invalid_unknown" ? "border-2 border-rose-600" : ""}"/>
+                    <Input id="user_api_key" type="password" class="{progressiveWrongAPIKey || form?.error === "invalid_api_key" || form?.error === "invalid_unknown" ? "border-2 border-rose-600" : ""}"/>
                     {#if progressiveWrongAPIKey || form?.error === "invalid_api_key" || form?.error === "invalid_unknown"}
                         <p class="text-sm text-muted-foreground text-red-600">Please provide a valid API Key.</p>
                     {/if}
