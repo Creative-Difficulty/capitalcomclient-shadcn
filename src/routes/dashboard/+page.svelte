@@ -31,7 +31,7 @@
     import toast from "svelte-french-toast";
     // export let data: PageData;
     let accountBalanceCardComponent: AccountBalanceCard;
-    let AccountBalanceCardUpdatetimeout: number;
+    let AccountBalanceCardUpdatetimeout: NodeJS.Timeout;
     onMount(async () => {
         console.log($SignedIntoAccount);
         let i = 1;

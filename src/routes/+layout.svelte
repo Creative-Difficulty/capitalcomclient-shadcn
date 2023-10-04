@@ -7,7 +7,7 @@
     import toast, { Toaster } from "svelte-french-toast";
     import { onDestroy, onMount } from "svelte";
 
-    let refreshTimeout: number;
+    let refreshTimeout: NodeJS.Timeout;
 
     onMount(() => {
         if($BaseAPIURL === undefined && !$page.route.id?.startsWith("/login")) {
