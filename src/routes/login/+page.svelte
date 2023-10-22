@@ -101,7 +101,7 @@
                     progressiveWrongPassword = false;
                 }
                 
-                if(formDataObjects.user_password.toString().length < 1) {
+                if(formDataObjects.user_api_key.toString().length < 1) {
                     progressiveWrongAPIKey = true;
                 }
                 return async ({ result, update }) => {
