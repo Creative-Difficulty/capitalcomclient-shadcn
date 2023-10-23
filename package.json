@@ -4,13 +4,12 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "pnpm exec vite dev",
-    "build": "pnpm exec vite build",
-    "preview": "pnpm exec vite preview",
-    "check": "pnpm exec svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-    "check:watch": "pnpm exec svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-    "update": "pnpm exec ncu -u && npm i",
-    "preinstall": "npx only-allow pnpm"
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+    "update": "ncu -u && npm i"
   },
   "devDependencies": {
     "@sveltejs/adapter-auto": "^2.1.0",
@@ -28,6 +27,7 @@
     "vite": "^4.4.9"
   },
   "dependencies": {
+    "@vercel/analytics": "^1.1.1",
     "bits-ui": "^0.5.7",
     "clsx": "^2.0.0",
     "lucide-svelte": "^0.276.0",
